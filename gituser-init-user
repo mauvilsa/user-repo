@@ -1,0 +1,117 @@
+#!/bin/bash
+
+##
+## Command for enabling users for personal svn/git repositories.
+##
+## @version $Revision: 106 $$Date:: 2015-11-27 #$
+## @author Mauricio Villegas <mauricio_ville@yahoo.com>
+## @link https://github.com/mauvilsa/apache-user-repo
+##
+
+##
+## The MIT License (MIT)
+##
+## Copyright (c) 2014 to the present, Mauricio Villegas
+##
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included in all
+## copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+## SOFTWARE.
+##
+
+USER="$1";
+GROUP="$USER";
+
+REPODIR="public_svn";
+CONF="/etc/apache2/mods-available/user-repo-svn-users";
+MACRO="UserSVN";
+if [ "${0##*/}" = "gituser-init-user" ]; then
+  REPODIR="public_git";
+  CONF="/etc/apache2/mods-available/user-repo-git-users";
+  MACRO="UserGIT";
+fi
+
+APACHE=$(ps aux | sed -n '/^root/d; /bin\/apache2/{ s| .*||; p; q; }' | less);
+
+if [ "$#" = 0 ]; then
+  echo "${0##*/}: error: not enough input arguments";
+  echo "Usage: ${0##*/} USER";
+  exit 1;
+elif [ "$(whoami)" != "root" ]; then
+  echo "${0##*/}: error: this script has to be run as root";
+  exit 1;
+elif [ ! -d "/home/$USER" ]; then
+  echo "${0##*/}: error: user's home directory does not exist";
+  exit 1;
+elif [ -d "/home/$USER/$REPODIR" ]; then
+  echo "${0##*/}: error: user's $REPODIR already exists";
+  exit 1;
+elif [ "$APACHE" = "" ]; then
+  echo "${0##*/}: error: unable to determine apache's running user";
+  exit 1;
+fi
+
+adduser "$APACHE" "$GROUP";
+if [ "$?" != 0 ]; then
+  GROUP="l-$USER";
+  uid=$(id "$USER" | sed 's|^uid=\([0-9]*\).*|\1|');
+  groupadd -g $((uid+1000)) "$GROUP";
+  adduser "$USER" "$GROUP";
+  adduser "$APACHE" "$GROUP";
+fi
+
+mkdir "/home/$USER/$REPODIR";
+touch "/home/$USER/$REPODIR/.htpasswd";
+
+[ "${0##*/}" = "svnuser-init-user" ] &&
+echo "### This file is an example authorization file for svnserve.
+### Its format is identical to that of mod_authz_svn authorization
+### files.
+### As shown below each section defines authorizations for the path and
+### (optional) repository specified by the section name.
+### The authorizations follow. An authorization line can refer to:
+###  - a single user,
+###  - a group of users defined in a special [groups] section,
+###  - an alias defined in a special [aliases] section,
+###  - all authenticated users, using the '\$authenticated' token,
+###  - only anonymous users, using the '\$anonymous' token,
+###  - anyone, using the '*' wildcard.
+###
+### A match can be inverted by prefixing the rule with '~'. Rules can
+### grant read ('r') access, read-write ('rw') access, or no access
+### ('')." \
+  > "/home/$USER/$REPODIR/.svn-authz";
+
+echo "See 'man user-repo'." > "/home/$USER/$REPODIR/README.txt";
+
+chown -R "$USER:$GROUP" "/home/$USER/$REPODIR";
+chmod 0640 "/home/$USER/$REPODIR"/.[hs]*; # rwxr----
+chmod 2750 "/home/$USER/$REPODIR";        # rwxr-s--
+chmod ug-w "/home/$USER/$REPODIR/README.txt";
+chmod go+x "/home/$USER";
+
+echo "${0##*/}: created user's public_git directory";
+find "/home/$USER/$REPODIR" | xargs ls -ld;
+
+if [ $(grep -c "^Use $MACRO $USER$" "$CONF") != 0 ]; then
+  echo "${0##*/}: warning: 'Use $MACRO $USER' already in $CONF";
+else
+  echo "Use $MACRO $USER" >> "$CONF";
+  echo "${0##*/}: added 'Use $MACRO $USER' to $CONF";
+fi
+
+echo "${0##*/}: restarting apache";
+service apache2 restart;

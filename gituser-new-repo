@@ -1,0 +1,149 @@
+#!/bin/bash
+
+##
+## Command for creating or importing personal svn/git repositories.
+##
+## @version $Revision: 106 $$Date:: 2015-11-27 #$
+## @author Mauricio Villegas <mauricio_ville@yahoo.com>
+## @link https://github.com/mauvilsa/apache-user-repo
+##
+
+##
+## The MIT License (MIT)
+##
+## Copyright (c) 2014 to the present, Mauricio Villegas
+##
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included in all
+## copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+## SOFTWARE.
+##
+
+if [ "$#" = 0 ] || [ "$1" = "" ]; then
+  echo "${0##*/}: error: not enough input arguments";
+  case "${0##*/}" in
+    "svnuser-new-repo")    echo "Usage: svnuser-new-repo REPONAME" ;;
+    "svnuser-import-repo") echo "Usage: svnuser-import-repo REPOPATH" ;;
+    "gituser-new-repo")    echo "Usage: gituser-new-repo REPONAME" ;;
+    "gituser-import-repo") echo "Usage: gituser-import-repo REPOPATH" ;;
+  esac
+  exit 1;
+fi
+
+
+USER=$(whoami);
+TYPE=$(echo "${0##*/}" | sed 's|^\(...\).*|\1|'); # svn or git
+TASK=$(echo "${0##*/}" | sed 's|...user-\([^-]*\)-repo|\1|'); # new or import
+REPODIR="public_$TYPE";
+
+REPO="$1";
+[ "$TYPE" = "git" ] &&
+  REPO=$(echo "$1" | sed 's|\.git$||; s|$|.git|;');
+
+if [ "$TASK" = "import" ]; then
+  REPOPATH="$REPO";
+  REPO=$(echo "$REPO" | sed 's|/*$||; /\// s|.*/||');
+
+  if [ "$REPO" = "" ]; then
+    echo "${0##*/}: error: unexpected repository path";
+    exit 1;
+  elif [ ! -d "$REPOPATH" ]; then
+    echo "${0##*/}: error: directory $REPOPATH does not exist";
+    exit 1;
+  fi
+fi
+
+if [ $(echo "$REPO" | grep '[ /?&]' | wc -l) != 0 ]; then
+  echo "${0##*/}: error: repository names should not contain the characters [ /?&]";
+  exit 1;
+elif [ ! -d "/home/$USER/$REPODIR" ] ||
+     [ $(grep -c "^Use User... $USER$" /etc/apache2/mods-available/user-repo-$TYPE-users) = 0 ]; then
+  echo "${0##*/}: error: user not enabled for $TYPE repositories, contact administrator";
+  exit 1;
+elif [ -e "/home/$USER/$REPODIR/$REPO" ]; then
+  echo "${0##*/}: error: path '/home/$USER/$REPODIR/$REPO' already taken";
+  exit 1;
+fi
+
+if [ "$TASK" = "new" ]; then
+  if [ "$TYPE" = "svn" ]; then
+    mkdir "/home/$USER/_${0##*/}_tmp_$REPO";
+    svnadmin create --fs-type fsfs "/home/$USER/_${0##*/}_tmp_$REPO/$REPO";
+    #chmod u+w "/home/$USER/$REPODIR";
+    cp -r --preserve=timestamps "/home/$USER/_${0##*/}_tmp_$REPO/$REPO" "/home/$USER/$REPODIR/";
+    rm -fr "/home/$USER/_${0##*/}_tmp_$REPO";
+  elif [ "$TYPE" = "git" ]; then
+    mkdir "/home/$USER/$REPODIR/$REPO";
+    cd "/home/$USER/$REPODIR/$REPO";
+    git --bare init;
+    git update-server-info;
+  fi
+
+elif [ "$TASK" = "import" ]; then
+  RC="1";
+  if [ "$TYPE" = "svn" ]; then
+    svnadmin verify "$REPOPATH";
+    RC="$?";
+  elif [ "$TYPE" = "git" ]; then
+    cd "$REPOPATH";
+    git fsck;
+    RC="$?";
+    cd - >/dev/null;
+  fi
+  if [ "$RC" != 0 ]; then
+    echo "${0##*/}: error: failed verification of repository '$REPOPATH'";
+    #chmod u-w "/home/$USER/$REPODIR";
+    exit 1;
+  fi
+
+  cp -r --preserve=timestamps "$REPOPATH" "/home/$USER/$REPODIR/";
+  if [ "$?" != 0 ]; then
+    echo "${0##*/}: error: problems importing repository '$REPOPATH', contact administrator";
+    #chmod u-w /home/$USER/$REPODIR;
+    exit 1;
+  fi
+  rm -fr "$REPOPATH";
+fi
+[ "$TYPE" = "svn" ] &&
+  mkdir -p "/home/$USER/$REPODIR/$REPO/dav/activities.d";
+chmod -R o-rwx "/home/$USER/$REPODIR/$REPO";
+for p in r w x; do
+  find "/home/$USER/$REPODIR/$REPO" -perm -u+$p | xargs chmod g+$p;
+done
+
+if [ "$TYPE" = "svn" ]; then
+  [ $(grep -c "^\[$REPO:" "/home/$USER/$REPODIR/.svn-authz") = 0 ] &&
+    printf "\n[%s:/]\n%s = rw\n* =\n" "$REPO" "$USER" \
+      >> "/home/$USER/public_svn/.svn-authz";
+elif [ "$TYPE" = "git" ]; then
+  if [ -f "/home/$USER/$REPODIR/$REPO/.htaccess" ]; then
+    n=$(ls "/home/$USER/$REPODIR/$REPO/.htaccess"~* 2>/dev/null | wc -l);
+    mv "/home/$USER/$REPODIR/$REPO/.htaccess" "/home/$USER/$REPODIR/$REPO/.htaccess"~$((n+1));
+    echo "Renamed existing file .htaccess in migrated repository to .htaccess~$((n+1))";
+  fi
+  printf "<Limit GET OPTIONS PROPFIND>\n  require user $USER # Here add users for read access (separated by spaces)\n</Limit>\n<LimitExcept GET OPTIONS PROPFIND>\n  require user $USER # Here add users for write access (separated by spaces)\n</LimitExcept>\n" \
+    > "/home/$USER/$REPODIR/$REPO/.htaccess";
+fi
+
+case "$TASK" in
+  "new")    echo "Created repository ~/$REPODIR/$REPO" ;;
+  "import") echo "Imported repository ~/$REPODIR/$REPO" ;;
+esac
+case "$TYPE" in
+  "svn") echo "Remember to adjust access permissions in file ~/$REPODIR/.svn-authz" ;;
+  "git") echo "Remember to adjust access permissions in file ~/$REPODIR/$REPO/.htaccess" ;;
+esac
+echo "To give access to external users, add them to ~/$REPODIR/.htpasswd";

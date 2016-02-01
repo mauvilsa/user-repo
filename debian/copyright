@@ -1,0 +1,7 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: libapache2-mod-user-repo
+Source: https://github.com/mauvilsa/apache-user-repo
+
+Files: *
+Copyright: Mauricio Villegas <mauricio_ville@yahoo.com>
+License: MIT
