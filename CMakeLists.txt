@@ -7,7 +7,7 @@ file( TO_NATIVE_PATH "${SYSCONFDIR}" SYSCONFDIR )
 
 add_custom_target( man1 ALL DEPENDS README.md
   COMMAND mkdir -p man1
-  COMMAND ronn --man README.md | gzip > man1/user-repo.1.gz
+  COMMAND pandoc -s -t man README.md -o - | gzip > man1/user-repo.1.gz
   COMMAND ln -fs user-repo.1.gz man1/svnuser-new-repo.1.gz
   COMMAND ln -fs user-repo.1.gz man1/gituser-new-repo.1.gz
   COMMAND ln -fs user-repo.1.gz man1/svnuser-import-repo.1.gz
@@ -15,7 +15,7 @@ add_custom_target( man1 ALL DEPENDS README.md
   COMMAND ln -fs user-repo.1.gz man1/svnuser-init-user.1.gz
   COMMAND ln -fs user-repo.1.gz man1/gituser-init-user.1.gz )
 
-#  COMMAND pandoc -s -t man README.md -o - | gzip > man1/user-repo.1.gz
+#  COMMAND ronn --man README.md | gzip > man1/user-repo.1.gz
 #  COMMAND go-md2man -in=${CMAKE_HOME_DIRECTORY}/README.md -out=man1/user-repo.1 && gzip man1/user-repo.1
 
 add_custom_target( deb DEPENDS man1
