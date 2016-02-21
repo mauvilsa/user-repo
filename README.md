@@ -16,10 +16,6 @@ svnuser-import-repo ~/<*reponame*>
 
 gituser-import-repo ~/<*reponame*>
 
-svnuser-init-user <*user*>
-
-gituser-init-user <*user*>
-
 # DESCRIPTION
 
 This is a module for the apache web server that allows users to create, import
@@ -28,8 +24,8 @@ and manage their own svn or git repositories, in a sense similar to
 repositories may depend on how the module is configured, although the default is
 that repositories become accessible as:
 
-  * http://{serveraddress}/svn/~{owneruser}/{reponame}
-  * http://{user}@{serveraddress}/git/~{owneruser}/{reponame}
+* http://{serveraddress}/svn/~{owneruser}/{reponame}
+* http://{user}@{serveraddress}/git/~{owneruser}/{reponame}
 
 where {owneruser} is the login name of the repository owner, {user} is the
 login name of the user that accesses the repository and {reponame} is the name
@@ -85,6 +81,30 @@ repository.
 External users need to be added to the files *~/public_svn/.htpasswd* or
 *~/public_git/.htpasswd*. For instructions on how to do this see man
 htpasswd(1).
+
+## Configuring users for personal repositories
+
+Unlike userdir, by default users are not enabled for personal repositories. To
+initialize a user, the system administrator needs to issue the command
+svnuser-init-user or gituser-init-user followed by the user. The initialization
+command creates a group for the user that the apache server can access, creates
+the repositories directory with the appropriate permissions, adds the user to
+the module configuration and finally it restarts the apache server.
+
+
+# INSTALLATION
+
+Currently this module is designed for debian based distributions. The preferred
+way of installation is to use the deb package, making sure that all dependencies
+are also installed, for example install using gdebi.
+
+The deb package can be easily created from the source. First you need to install
+devscripts, cmake and pandoc. Then the package is built by running
+
+$ cmake . && make deb
+
+If everything works as expected, you will find the deb package in the current
+directory.
 
 
 # COPYRIGHT

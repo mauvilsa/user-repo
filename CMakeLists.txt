@@ -17,10 +17,12 @@ add_custom_target( man1 ALL DEPENDS README.md
 
 add_custom_target( deb DEPENDS man1
   COMMAND mkdir deb ${PROJECT_NAME}-${PROJECT_VERSION}
-  COMMAND rsync -av CMakeLists.txt debian README.md man1 svnuser-* gituser-* user-repo* ${PROJECT_NAME}-${PROJECT_VERSION}
+  COMMAND rsync -av ${CMAKE_SOURCE_DIR}/CMakeLists.txt ${CMAKE_SOURCE_DIR}/debian ${CMAKE_SOURCE_DIR}/README.md ${CMAKE_SOURCE_DIR}/svnuser-* ${CMAKE_SOURCE_DIR}/gituser-* ${CMAKE_SOURCE_DIR}/user-repo* man1 ${PROJECT_NAME}-${PROJECT_VERSION}
   COMMAND tar -czf deb/${PROJECT_NAME}_${PROJECT_VERSION}.orig.tar.gz ${PROJECT_NAME}-${PROJECT_VERSION}
   COMMAND mv ${PROJECT_NAME}-${PROJECT_VERSION} deb
-  COMMAND cd deb/${PROJECT_NAME}-${PROJECT_VERSION} && debuild -us -uc )
+  COMMAND cd deb/${PROJECT_NAME}-${PROJECT_VERSION} && debuild -us -uc
+  COMMAND mv deb/*.deb .
+  COMMAND rm -r deb )
 
 install( PROGRAMS svnuser-new-repo svnuser-import-repo gituser-new-repo gituser-import-repo DESTINATION bin )
 install( PROGRAMS svnuser-init-user gituser-init-user DESTINATION sbin )
