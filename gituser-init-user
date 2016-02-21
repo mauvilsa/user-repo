@@ -64,14 +64,14 @@ elif [ "$APACHE" = "" ]; then
   exit 1;
 fi
 
-adduser "$APACHE" "$GROUP";
-if [ "$?" != 0 ]; then
+#adduser "$APACHE" "$GROUP";
+#if [ "$?" != 0 ]; then
   GROUP="l-$USER";
   uid=$(id "$USER" | sed 's|^uid=\([0-9]*\).*|\1|');
   groupadd -g $((uid+1000)) "$GROUP";
   adduser "$USER" "$GROUP";
   adduser "$APACHE" "$GROUP";
-fi
+#fi
 
 mkdir "/home/$USER/$REPODIR";
 touch "/home/$USER/$REPODIR/.htpasswd";
@@ -103,7 +103,7 @@ chmod 2750 "/home/$USER/$REPODIR";        # rwxr-s--
 chmod ug-w "/home/$USER/$REPODIR/README.txt";
 chmod go+x "/home/$USER";
 
-echo "${0##*/}: created user's public_git directory";
+echo "${0##*/}: created user's $REPODIR directory";
 find "/home/$USER/$REPODIR" | xargs ls -ld;
 
 if [ $(grep -c "^Use $MACRO $USER$" "$CONF") != 0 ]; then

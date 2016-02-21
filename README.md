@@ -1,5 +1,5 @@
 % user-repo(1) Apache module for personal svn/git repositories
-% Mauricio Villegas
+% Mauricio Villegas <mauricio_ville@yahoo.com>
 % 2016-02-07
 
 # NAME
@@ -91,7 +91,7 @@ htpasswd(1).
 
 The MIT License (MIT)
 
-Copyright (c) 2014 to the present, Mauricio Villegas <<mauricio_ville@yahoo.com>>
+Copyright (c) 2014 to the present, Mauricio Villegas <mauricio_ville@yahoo.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

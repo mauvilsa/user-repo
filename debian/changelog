@@ -1,5 +1,17 @@
+libapache2-mod-user-repo (1.2-1) UNRELEASED; urgency=low
+
+  * Fixed external pwauth authentication
+
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 21 Feb 2016 11:50:05 +0200
+
+libapache2-mod-user-repo (1.1-1) UNRELEASED; urgency=low
+
+  * Changed man build to use pandoc, and updated the README.md
+
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 7 Feb 2016 16:14:24 +0200
+
 libapache2-mod-user-repo (1.0-1) UNRELEASED; urgency=low
 
-  * Initial release.
+  * Initial version.
 
  -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 31 Jan 2016 17:28:16 +0200

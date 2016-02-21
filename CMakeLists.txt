@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.0.0 )
 cmake_policy( SET CMP0048 NEW )
-project( libapache2-mod-user-repo VERSION 1.0 LANGUAGES NONE )
+project( libapache2-mod-user-repo VERSION 1.2 LANGUAGES NONE )
 
 set( SYSCONFDIR /etc CACHE PATH "System configuration directory" )
 file( TO_NATIVE_PATH "${SYSCONFDIR}" SYSCONFDIR )
@@ -14,9 +14,6 @@ add_custom_target( man1 ALL DEPENDS README.md
   COMMAND ln -fs user-repo.1.gz man1/gituser-import-repo.1.gz
   COMMAND ln -fs user-repo.1.gz man1/svnuser-init-user.1.gz
   COMMAND ln -fs user-repo.1.gz man1/gituser-init-user.1.gz )
-
-#  COMMAND ronn --man README.md | gzip > man1/user-repo.1.gz
-#  COMMAND go-md2man -in=${CMAKE_HOME_DIRECTORY}/README.md -out=man1/user-repo.1 && gzip man1/user-repo.1
 
 add_custom_target( deb DEPENDS man1
   COMMAND mkdir deb ${PROJECT_NAME}-${PROJECT_VERSION}

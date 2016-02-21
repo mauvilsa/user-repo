@@ -1,1 +1,1 @@
-# Depends: macro dav_svn authz_svn dav_fs
+# Depends: macro dav_svn authz_svn dav_fs authnz_external
