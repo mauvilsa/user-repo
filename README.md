@@ -8,13 +8,10 @@ user-repo - Apache module for personal svn/git repositories
 
 # SYNOPSIS
 
-svnuser-new-repo <*reponame*>
-
-gituser-new-repo <*reponame*>
-
-svnuser-import-repo ~/<*reponame*>
-
-gituser-import-repo ~/<*reponame*>
+svnuser-new-repo <*reponame*>  
+gituser-new-repo <*reponame*>  
+svnuser-import-repo ~/<*reponame*>  
+gituser-import-repo ~/<*reponame*>  
 
 # DESCRIPTION
 

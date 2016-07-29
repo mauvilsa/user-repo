@@ -2,11 +2,11 @@ Source: libapache2-mod-user-repo
 Maintainer: Mauricio Villegas <mauricio_ville@yahoo.com>
 Section: web
 Priority: optional
-Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), cmake, pandoc
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9), apache2-dev, cmake, pandoc
 
 Package: libapache2-mod-user-repo
 Architecture: all
 Depends: ${misc:Depends}, apache2-bin, libapache2-mod-svn, pwauth, libapache2-mod-authnz-external
 Description: Apache module for personal svn/git repositories
- This is a module for the apache web server that allows users to create, import and manage their own svn or git repositories.
+ Apache module that allows users to manage their own svn or git repositories.
