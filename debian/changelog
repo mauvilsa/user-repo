@@ -1,3 +1,11 @@
+libapache2-mod-user-repo (2016.10.02-1) UNRELEASED; urgency=low
+
+  * Changed versioning to YYYY.MM.DD
+  * Added pre-commit hook to check syntax and update versions
+  * Symlink creation at install time
+
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 2 Oct 2016 20:11:47 +0200
+
 libapache2-mod-user-repo (1.2-1) UNRELEASED; urgency=low
 
   * Fixed external pwauth authentication

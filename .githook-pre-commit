@@ -1,0 +1,31 @@
+#!/bin/bash
+
+FILES=( $(git status --porcelain | grep ^M) );
+V=$(date -u +%Y.%m.%d);
+NEWVER="no";
+
+n=1;
+while [ "$n" -lt "${#FILES[@]}" ]; do
+  case "${FILES[$n]}" in
+    "gituser-init-user" | "gituser-new-repo" )
+      echo "${0##*/}: checking syntax of ${FILES[$n]}" 1>&2;
+      bash -n "${FILES[$n]}";
+      [ "$?" != "0" ] && exit 1;
+      [ "${FILES[$((n-1))]}" == "MM" ] &&
+        echo "${0##*/}: error: unable to update version due to change after staged: ${FILES[$n]}" 1>&2 &&
+        exit 1;
+      echo "${0##*/}: updating version of ${FILES[$n]}" 1>&2;
+      sed -i 's|$Version:[^$]*\$|$Version: '"$V"'$|' "${FILES[$n]}";
+      git add "${FILES[$n]}";
+      NEWVER="yes";
+      ;;
+  esac
+  n=$((n+2));
+done
+
+if [ "$NEWVER" = "yes" ]; then
+  sed -ri 's|(libapache2-mod-user-repo VERSION) [^ ]+ |\1 '"$V"' |' CMakeLists.txt;
+  git add CMakeLists.txt;
+fi
+
+exit 0;
