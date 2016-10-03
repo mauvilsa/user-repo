@@ -1,24 +1,25 @@
-libapache2-mod-user-repo (2016.10.02-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2016.10.3-1) UNRELEASED; urgency=low
 
   * Changed versioning to YYYY.MM.DD
   * Added pre-commit hook to check syntax and update versions
   * Symlink creation at install time
+  * Fixed cmake's deb target addressing warnings and errors from lintian
 
- -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 2 Oct 2016 20:11:47 +0200
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Mon, 3 Oct 2016 6:15:04 +0200
 
-libapache2-mod-user-repo (1.2-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2016.2.21-1) UNRELEASED; urgency=low
 
   * Fixed external pwauth authentication
 
  -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 21 Feb 2016 11:50:05 +0200
 
-libapache2-mod-user-repo (1.1-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2016.2.7-1) UNRELEASED; urgency=low
 
   * Changed man build to use pandoc, and updated the README.md
 
  -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 7 Feb 2016 16:14:24 +0200
 
-libapache2-mod-user-repo (1.0-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2016.1.31-1) UNRELEASED; urgency=low
 
   * Initial version.
 

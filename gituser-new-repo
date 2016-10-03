@@ -48,7 +48,7 @@ if [ $(echo "$REPO" | grep '[ /?&]' | wc -l) != 0 ]; then
   echo "${0##*/}: error: repository names should not contain the characters [ /?&]";
   exit 1;
 elif [ ! -d "/home/$USER/$REPODIR" ] ||
-     [ $(grep -c "^Use User... $USER$" /etc/apache2/mods-available/user-repo-$TYPE-users) = 0 ]; then
+     [ $(grep -c "^Use User... $USER$" /etc/apache2/user-repo-$TYPE-users) = 0 ]; then
   echo "${0##*/}: error: user not enabled for $TYPE repositories, contact administrator";
   exit 1;
 elif [ -e "/home/$USER/$REPODIR/$REPO" ]; then
