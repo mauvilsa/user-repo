@@ -1,0 +1,11 @@
+#!/bin/bash
+
+git log | sed '/^commit/d; /^Author:/d;' > CHANGELOG.md;
+
+if [ $(git status --porcelain | grep -c CHANGELOG.md) != 0 ]; then
+  git add CHANGELOG.md;
+  git commit --amend --no-edit;
+  echo "Updated CHANGELOG.md";
+fi
+
+exit 0;

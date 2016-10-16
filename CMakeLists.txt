@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.0.0 )
 cmake_policy( SET CMP0048 NEW )
-project( libapache2-mod-user-repo VERSION 2016.10.02 LANGUAGES NONE )
+project( libapache2-mod-user-repo VERSION 2016.10.16 LANGUAGES NONE )
 
 set( SYSCONFDIR /etc CACHE PATH "System configuration directory" )
 file( TO_NATIVE_PATH "${SYSCONFDIR}" SYSCONFDIR )
@@ -21,18 +21,20 @@ add_custom_target( man1 ALL DEPENDS README.md
   COMMAND ln -fs user-repo.1.gz man1/gituser-init-user.1.gz
   VERBATIM )
 
-add_custom_target( deb DEPENDS man1
+add_custom_target( deb
   COMMAND mkdir deb ${PROJECT_NAME}-${PROJECT_VERSION}
-  COMMAND rsync -av ${CMAKE_SOURCE_DIR}/CMakeLists.txt ${CMAKE_SOURCE_DIR}/debian ${CMAKE_SOURCE_DIR}/*.md ${CMAKE_SOURCE_DIR}/gituser-* ${CMAKE_SOURCE_DIR}/user-repo* man1 ${PROJECT_NAME}-${PROJECT_VERSION}
+  COMMAND rsync -av ${CMAKE_SOURCE_DIR}/CMakeLists.txt ${CMAKE_SOURCE_DIR}/debian ${CMAKE_SOURCE_DIR}/*.md ${CMAKE_SOURCE_DIR}/gituser-* ${CMAKE_SOURCE_DIR}/user-repo* ${PROJECT_NAME}-${PROJECT_VERSION}
   COMMAND tar -czf deb/${PROJECT_NAME}_${PROJECT_VERSION}.orig.tar.gz ${PROJECT_NAME}-${PROJECT_VERSION}
   COMMAND mv ${PROJECT_NAME}-${PROJECT_VERSION} deb
   COMMAND cd deb/${PROJECT_NAME}-${PROJECT_VERSION} && debuild -us -uc
-  COMMAND mv deb/*.deb .
-  COMMAND rm -r deb )
+  COMMAND mv deb/*.deb . )
+
+add_custom_target( tgz
+  cd ${CMAKE_SOURCE_DIR} && git archive --prefix=${PROJECT_NAME}/ HEAD -o ${CMAKE_BINARY_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.tar.gz )
 
 install( PROGRAMS gituser-new-repo DESTINATION bin )
 install( PROGRAMS gituser-init-user DESTINATION sbin )
-install( DIRECTORY man1 DESTINATION share/man )
+install( DIRECTORY ${CMAKE_BINARY_DIR}/man1 DESTINATION share/man )
 install( FILES user-repo.load user-repo.conf DESTINATION ${SYSCONFDIR}/apache2/mods-available )
 install( FILES user-repo-svn-users user-repo-git-users DESTINATION ${SYSCONFDIR}/apache2 )
 install( CODE "execute_process( COMMAND ln -fs gituser-new-repo \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/svnuser-new-repo )" )
@@ -40,4 +42,6 @@ install( CODE "execute_process( COMMAND ln -fs gituser-new-repo \$ENV{DESTDIR}\$
 install( CODE "execute_process( COMMAND ln -fs gituser-new-repo \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/gituser-import-repo )" )
 install( CODE "execute_process( COMMAND ln -fs gituser-init-user \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/sbin/svnuser-init-user )" )
 
-add_custom_target( realclean cd ${CMAKE_HOME_DIRECTORY} COMMAND rm -fr CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt Makefile man1 deb ${PROJECT_NAME}-${PROJECT_VERSION} )
+set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES man1 deb )
+
+add_custom_target( realclean make clean && rm -fr CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt Makefile )

@@ -3,15 +3,14 @@
 ##
 ## Command for creating or importing personal svn/git repositories.
 ##
-## @version $Version: 2016.10.02$
+## @version $Version: 2016.10.16$
 ## @author Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @copyright Copyright(c) 2014-present, Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @license MIT License
-## @link https://github.com/mauvilsa/user-repo.git
+## @link https://github.com/mauvilsa/user-repo
 ##
 
-if [ "$#" = 0 ] || [ "$1" = "" ]; then
-  echo "${0##*/}: error: not enough input arguments";
+if [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   case "${0##*/}" in
     "svnuser-new-repo")    echo "Usage: svnuser-new-repo REPONAME" ;;
     "svnuser-import-repo") echo "Usage: svnuser-import-repo REPOPATH" ;;
@@ -31,6 +30,7 @@ REPO="$1";
 [ "$TYPE" = "git" ] &&
   REPO=$(echo "$1" | sed 's|\.git$||; s|$|.git|;');
 
+### Check input arguments ###
 if [ "$TASK" = "import" ]; then
   REPOPATH="$REPO";
   REPO=$(echo "$REPO" | sed 's|/*$||; /\// s|.*/||');
@@ -44,7 +44,7 @@ if [ "$TASK" = "import" ]; then
   fi
 fi
 
-if [ $(echo "$REPO" | grep '[ /?&]' | wc -l) != 0 ]; then
+if [ $(echo "$REPO" | grep -c '[ /?&]') != 0 ]; then
   echo "${0##*/}: error: repository names should not contain the characters [ /?&]";
   exit 1;
 elif [ ! -d "/home/$USER/$REPODIR" ] ||
@@ -56,6 +56,7 @@ elif [ -e "/home/$USER/$REPODIR/$REPO" ]; then
   exit 1;
 fi
 
+### Creating new repository ###
 if [ "$TASK" = "new" ]; then
   if [ "$TYPE" = "svn" ]; then
     mkdir "/home/$USER/_${0##*/}_tmp_$REPO";
@@ -70,6 +71,7 @@ if [ "$TASK" = "new" ]; then
     git update-server-info;
   fi
 
+### Importing existing repository ###
 elif [ "$TASK" = "import" ]; then
   RC="1";
   if [ "$TYPE" = "svn" ]; then
@@ -95,6 +97,8 @@ elif [ "$TASK" = "import" ]; then
   fi
   rm -fr "$REPOPATH";
 fi
+
+### Fix repository files permissions ###
 [ "$TYPE" = "svn" ] &&
   mkdir -p "/home/$USER/$REPODIR/$REPO/dav/activities.d";
 chmod -R o-rwx "/home/$USER/$REPODIR/$REPO";
@@ -102,6 +106,7 @@ for p in r w x; do
   find "/home/$USER/$REPODIR/$REPO" -perm -u+$p | xargs chmod g+$p;
 done
 
+### Setup repository access authentication and permissions ###
 if [ "$TYPE" = "svn" ]; then
   [ $(grep -c "^\[$REPO:" "/home/$USER/$REPODIR/.svn-authz") = 0 ] &&
     printf "\n[%s:/]\n%s = rw\n* =\n" "$REPO" "$USER" \
@@ -116,6 +121,7 @@ elif [ "$TYPE" = "git" ]; then
     > "/home/$USER/$REPODIR/$REPO/.htaccess";
 fi
 
+### Execution overview messages ###
 case "$TASK" in
   "new")    echo "Created repository ~/$REPODIR/$REPO" ;;
   "import") echo "Imported repository ~/$REPODIR/$REPO" ;;

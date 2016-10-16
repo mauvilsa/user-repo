@@ -3,15 +3,14 @@
 ##
 ## Command for enabling users for personal svn/git repositories.
 ##
-## @version $Version: 2016.10.02$
+## @version $Version: 2016.10.16$
 ## @author Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @copyright Copyright(c) 2014-present, Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @license MIT License
-## @link https://github.com/mauvilsa/user-repo.git
+## @link https://github.com/mauvilsa/user-repo
 ##
 
 USER="$1";
-GROUP="$USER";
 
 REPODIR="public_svn";
 CONF="/etc/apache2/user-repo-svn-users";
@@ -22,10 +21,10 @@ if [ "${0##*/}" = "gituser-init-user" ]; then
   MACRO="UserGIT";
 fi
 
-APACHE=$(ps aux | sed -n '/^root/d; /bin\/apache2/{ s| .*||; p; q; }' | less);
+APACHE=$(ps aux | sed -n '/^root/d; /bin\/apache2/{ s| .*||; p; q; }');
 
-if [ "$#" = 0 ]; then
-  echo "${0##*/}: error: not enough input arguments";
+### Check input arguments ###
+if [ "$#" = 0 ] || [ "$1" = "-h" ] || [ "$1" = "-help" ]; then
   echo "Usage: ${0##*/} USER";
   echo "For more information see man user-repo";
   exit 1;
@@ -43,15 +42,17 @@ elif [ "$APACHE" = "" ]; then
   exit 1;
 fi
 
-#adduser "$APACHE" "$GROUP";
-#if [ "$?" != 0 ]; then
-  GROUP="l-$USER";
-  uid=$(id "$USER" | sed 's|^uid=\([0-9]*\).*|\1|');
-  groupadd -g $((uid+1000)) "$GROUP";
-  adduser "$USER" "$GROUP";
-  adduser "$APACHE" "$GROUP";
-#fi
+### Create group for user and adding apache ###
+GROUP="l-$USER";
+uid=$(id -u "$USER");
+groupadd -g $((uid+1000)) "$GROUP";
+[ "$?" != 0 ] &&
+  echo "${0##*/}: error: problems creating group $GROUP with id $((uid+1000))" &&
+  exit 1;
+adduser "$USER" "$GROUP";
+adduser "$APACHE" "$GROUP";
 
+### Create user repositories directory and authentication files ###
 mkdir "/home/$USER/$REPODIR";
 touch "/home/$USER/$REPODIR/.htpasswd";
 
@@ -76,6 +77,7 @@ echo "### This file is an example authorization file for svnserve.
 
 echo "See 'man user-repo'." > "/home/$USER/$REPODIR/README.txt";
 
+### Fix repositories directory permissions ###
 chown -R "$USER:$GROUP" "/home/$USER/$REPODIR";
 chmod 0640 "/home/$USER/$REPODIR"/.[hs]*; # rwxr----
 chmod 2750 "/home/$USER/$REPODIR";        # rwxr-s--
@@ -85,6 +87,7 @@ chmod go+x "/home/$USER";
 echo "${0##*/}: created user's $REPODIR directory";
 find "/home/$USER/$REPODIR" | xargs ls -ld;
 
+### Add user to apache configuration and restart the server ###
 if [ $(grep -c "^Use $MACRO $USER$" "$CONF") != 0 ]; then
   echo "${0##*/}: warning: 'Use $MACRO $USER' already in $CONF";
 else
