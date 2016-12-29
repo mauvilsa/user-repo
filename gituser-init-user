@@ -3,7 +3,7 @@
 ##
 ## Command for enabling users for personal svn/git repositories.
 ##
-## @version $Version: 2016.10.16$
+## @version $Version: 2016.12.29$
 ## @author Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @copyright Copyright(c) 2014-present, Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @license MIT License
@@ -45,12 +45,25 @@ fi
 ### Create group for user and adding apache ###
 GROUP="l-$USER";
 uid=$(id -u "$USER");
-groupadd -g $((uid+1000)) "$GROUP";
-[ "$?" != 0 ] &&
-  echo "${0##*/}: error: problems creating group $GROUP with id $((uid+1000))" &&
-  exit 1;
+getent group "$GROUP" >/dev/null;
+if [ "$?" != 0 ]; then
+  groupadd -g $((uid+10000)) "$GROUP";
+  [ "$?" != 0 ] &&
+    echo "${0##*/}: error: problems creating group $GROUP with id $((uid+10000))" &&
+    exit 1;
+fi
 adduser "$USER" "$GROUP";
 adduser "$APACHE" "$GROUP";
+
+user_in_group () {
+  [ $(id -Gn "$1" | tr ' ' '\n' | grep -c "^$2\$") = 0 ] &&
+    return 1;
+  return 0;
+}
+if ! ( user_in_group "$USER" "$GROUP" && user_in_group "$APACHE" "$GROUP" ); then
+  echo "${0##*/}: error: problems adding $USER and/or $APACHE to group $GROUP" &&
+  exit 1;
+fi
 
 ### Create user repositories directory and authentication files ###
 mkdir "/home/$USER/$REPODIR";

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.0.0 )
 cmake_policy( SET CMP0048 NEW )
-project( libapache2-mod-user-repo VERSION 2016.10.16 LANGUAGES NONE )
+project( libapache2-mod-user-repo VERSION 2016.12.29 LANGUAGES NONE )
 
 set( SYSCONFDIR /etc CACHE PATH "System configuration directory" )
 file( TO_NATIVE_PATH "${SYSCONFDIR}" SYSCONFDIR )

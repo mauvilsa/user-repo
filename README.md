@@ -80,10 +80,11 @@ htpasswd(1).
 
 Unlike userdir, by default users are not enabled for personal repositories. To
 initialize a user, the system administrator needs to issue the command
-svnuser-init-user or gituser-init-user followed by the user. The initialization
-command creates a group for the user that the apache server can access, creates
-the repositories directory with the appropriate permissions, adds the user to
-the module configuration and finally it restarts the apache server.
+*svnuser-init-user* or *gituser-init-user* followed by the user. The
+initialization command creates a group for the user that the apache server can
+access, creates the repositories directory with the appropriate permissions,
+adds the user to the module configuration and finally it restarts the apache
+server.
 
 
 # INSTALLATION
@@ -95,7 +96,7 @@ are also installed, for example install using gdebi.
 The deb package can be easily created from the source. First you need to install
 devscripts, cmake and pandoc. Then the package is built by running
 
-$ cmake . && make deb
+$ mkdir build && cd build && cmake .. && make deb
 
 If everything works as expected, you will find the deb package in the current
 directory.

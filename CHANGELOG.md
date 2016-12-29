@@ -1,3 +1,8 @@
+Date:   Thu Dec 29 11:35:01 2016 +0100
+
+    - Fixed user init for second repo type
+    - Minor improvements to readme and conf
+
 Date:   Sun Oct 16 13:44:12 2016 +0200
 
     * Added gitattributes to ignore git and debian files when archiving
