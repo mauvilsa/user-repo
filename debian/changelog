@@ -1,5 +1,5 @@
-libapache2-mod-user-repo (2016.10.16-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2016.12.29-1) UNRELEASED; urgency=low
 
   * Initial packaged version.
 
- -- Mauricio Villegas <mauricio_ville@yahoo.com>  Sun, 16 Oct 2016 12:37:21 +0200
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Thu, 29 Dec 2016 11:59:36 +0100

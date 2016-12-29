@@ -1,3 +1,7 @@
+Date:   Thu Dec 29 12:03:09 2016 +0100
+
+    Updated precommit hook to check debian changelog
+
 Date:   Thu Dec 29 11:35:01 2016 +0100
 
     - Fixed user init for second repo type

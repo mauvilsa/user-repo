@@ -26,6 +26,11 @@ done
 if [ "$NEWVER" = "yes" ]; then
   sed -ri 's|(libapache2-mod-user-repo VERSION) [^ ]+ |\1 '"$V"' |' CMakeLists.txt;
   git add CMakeLists.txt;
+
+  DEB=$(sed -n '/^libapache2-mod-user-repo/{ s|.*(\([0-9.]*\)-[0-9]*).*|\1|p; q; }' debian/changelog);
+  [ "$DEB" != "$V" ] &&
+    echo "${0##*/}: error: debian chengelog needs to be updated" 1>&2 &&
+    exit 1;
 fi
 
 exit 0;
