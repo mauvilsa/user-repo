@@ -3,7 +3,7 @@
 ##
 ## Command for creating or importing personal svn/git repositories.
 ##
-## @version $Version: 2016.10.16$
+## @version $Version: 2017.01.30$
 ## @author Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @copyright Copyright(c) 2014-present, Mauricio Villegas <mauricio_ville@yahoo.com>
 ## @license MIT License
@@ -54,6 +54,15 @@ elif [ ! -d "/home/$USER/$REPODIR" ] ||
 elif [ -e "/home/$USER/$REPODIR/$REPO" ]; then
   echo "${0##*/}: error: path '/home/$USER/$REPODIR/$REPO' already taken";
   exit 1;
+fi
+
+if [ "$TYPE" = "svn" ]; then
+  AUTH_VAL=$(svnauthz-validate "/home/$USER/$REPODIR/.svn-authz" 2>&1);
+  if [ "$?" != 0 ]; then
+    echo "${0##*/}: error: the file ~/$REPODIR/.svn-authz fails to validate";
+    echo "$AUTH_VAL";
+    exit 1;
+  fi
 fi
 
 ### Creating new repository ###
@@ -127,7 +136,7 @@ case "$TASK" in
   "import") echo "Imported repository ~/$REPODIR/$REPO" ;;
 esac
 case "$TYPE" in
-  "svn") echo "Remember to adjust access permissions in file ~/$REPODIR/.svn-authz" ;;
+  "svn") echo "Remember to adjust access permissions in file ~/$REPODIR/.svn-authz and checking its syntax afterwards using the svnauthz-validate command" ;;
   "git") echo "Remember to adjust access permissions in file ~/$REPODIR/$REPO/.htaccess" ;;
 esac
 echo "To give access to external users, add them to ~/$REPODIR/.htpasswd";

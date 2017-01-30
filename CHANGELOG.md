@@ -1,3 +1,7 @@
+Date:   Mon Jan 30 08:20:59 2017 +0100
+
+    Validation of .svn-authz when creating svn repo and message reminding users to do so
+
 Date:   Thu Dec 29 12:03:09 2016 +0100
 
     Updated precommit hook to check debian changelog
