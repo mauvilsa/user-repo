@@ -1,3 +1,7 @@
+Date:   Mon Jan 30 11:55:20 2017 +0100
+
+    debian chagelog update in precommit hook
+
 Date:   Mon Jan 30 08:20:59 2017 +0100
 
     Validation of .svn-authz when creating svn repo and message reminding users to do so

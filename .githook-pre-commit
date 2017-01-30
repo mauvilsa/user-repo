@@ -2,7 +2,7 @@
 
 FILES=( $(git status --porcelain | grep ^M) );
 V=$(date -u +%Y.%m.%d);
-NEWVER="no";
+#NEWVER="no";
 
 n=1;
 while [ "$n" -lt "${#FILES[@]}" ]; do
@@ -17,20 +17,26 @@ while [ "$n" -lt "${#FILES[@]}" ]; do
       echo "${0##*/}: updating version of ${FILES[$n]}" 1>&2;
       sed -i 's|$Version:[^$]*\$|$Version: '"$V"'$|' "${FILES[$n]}";
       git add "${FILES[$n]}";
-      NEWVER="yes";
+      #NEWVER="yes";
       ;;
   esac
   n=$((n+2));
 done
 
-if [ "$NEWVER" = "yes" ]; then
+#if [ "$NEWVER" = "yes" ]; then
   sed -ri 's|(libapache2-mod-user-repo VERSION) [^ ]+ |\1 '"$V"' |' CMakeLists.txt;
   git add CMakeLists.txt;
 
   DEB=$(sed -n '/^libapache2-mod-user-repo/{ s|.*(\([0-9.]*\)-[0-9]*).*|\1|p; q; }' debian/changelog);
-  [ "$DEB" != "$V" ] &&
-    echo "${0##*/}: error: debian chengelog needs to be updated" 1>&2 &&
-    exit 1;
-fi
+  if [ "$DEB" != "$V" ]; then
+    which dch >/dev/null;
+    if [ "$?" = 0 ]; then
+      dch -v $V-1;
+    else
+      echo "${0##*/}: error: debian chengelog needs to be updated" 1>&2;
+      exit 1;
+    fi
+  fi
+#fi
 
 exit 0;
