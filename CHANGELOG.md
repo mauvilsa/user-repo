@@ -1,3 +1,7 @@
+Date:   Wed Aug 2 15:34:53 2017 +0200
+
+    Minor changes
+
 Date:   Mon Jan 30 11:55:20 2017 +0100
 
     debian chagelog update in precommit hook

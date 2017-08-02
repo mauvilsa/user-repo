@@ -13,13 +13,13 @@ gituser-import-repo ~/<*reponame*>
 # DESCRIPTION
 
 This is a module for the apache web server that allows users to create, import
-and manage their own svn or git repositories, in a sense similar to
-*userdir* which provides web directories for the users. The addresses of the
-repositories may depend on how the module is configured, although the default is
-that repositories become accessible as:
+and manage their own svn or git repositories, in a sense similar to *userdir*
+which provides web directories for the users. The addresses of the
+repositories may depend on how the module is configured, although the default
+is that repositories become accessible as:
 
 * http://{serveraddress}/svn/~{owneruser}/{reponame}
-* http://{user}@{serveraddress}/git/~{owneruser}/{reponame}
+* http://{user}@{serveraddress}/git/~{owneruser}/{reponame}.git
 
 where {owneruser} is the login name of the repository owner, {user} is the
 login name of the user that accesses the repository and {reponame} is the name
@@ -100,6 +100,13 @@ $ mkdir build && cd build && cmake .. && make deb
 
 If everything works as expected, you will find the deb package in the current
 directory.
+
+
+# CONTRIBUTING
+
+The source code is available in [github
+https://github.com/mauvilsa/user-repo](https://github.com/mauvilsa/user-repo).
+Reporting new issues and pull requests are welcome.
 
 
 # COPYRIGHT

@@ -29,13 +29,8 @@ done
 
   DEB=$(sed -n '/^libapache2-mod-user-repo/{ s|.*(\([0-9.]*\)-[0-9]*).*|\1|p; q; }' debian/changelog);
   if [ "$DEB" != "$V" ]; then
-    which dch >/dev/null;
-    if [ "$?" = 0 ]; then
-      dch -v $V-1;
-    else
-      echo "${0##*/}: error: debian chengelog needs to be updated" 1>&2;
-      exit 1;
-    fi
+    echo "${0##*/}: error: changelog needs to be updated, i.e. run: dch -v $V-1 && git add debian/changelog" 1>&2;
+    exit 1;
   fi
 #fi
 
