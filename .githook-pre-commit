@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FILES=( $(git status --porcelain | grep ^M) );
-V=$(date -u +%Y.%m.%d);
+V=$(date -u +%Y.%m.%d | sed 's|\.0|.|g');
 #NEWVER="no";
 
 n=1;

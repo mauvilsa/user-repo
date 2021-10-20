@@ -1,3 +1,7 @@
+Date:   Wed Oct 20 18:30:04 2021 +0200
+
+    Fixes for ubuntu 20.04
+
 Date:   Wed Aug 2 15:34:53 2017 +0200
 
     Minor changes

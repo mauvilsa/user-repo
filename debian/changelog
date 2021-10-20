@@ -1,5 +1,5 @@
-libapache2-mod-user-repo (2017.08.02-1) UNRELEASED; urgency=low
+libapache2-mod-user-repo (2021.10.20-1) UNRELEASED; urgency=low
 
-  * Current packaged version.
+  * Changes for ubuntu 20.04.
 
- -- Mauricio Villegas <mauricio_ville@yahoo.com>  Wed, 02 Aug 2017 15:44:31 +0200
+ -- Mauricio Villegas <mauricio_ville@yahoo.com>  Wed, 20 Oct 2021 19:05:17 +0200
